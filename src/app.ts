@@ -1,23 +1,19 @@
-import express from "express";
-import dotenv from "dotenv";
-import userRoutes from "./routes/user.routes";
+import http from 'http';
+import dotenv from 'dotenv';
+import { router } from './routes/user.routes';
 
 dotenv.config();
 
-const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use("/api/users", userRoutes);
-
-app.use((req, res) => {
-  res.status(404).json({ message: "Endpoint not found" });
+const server = http.createServer((req, res) => {
+  try {
+    router(req, res);
+  } catch (error) {
+    res.writeHead(500).end('Internal Server Error');
+  }
 });
 
-app.use((err: unknown, req: express.Request, res: express.Response) => {
-  res.status(500).json({ message: "Internal server error" });
-});
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+server.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
